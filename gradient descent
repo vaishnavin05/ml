@@ -1,0 +1,44 @@
+# ML-5: Gradient Descent to Find Local Minima
+
+import matplotlib.pyplot as plt
+
+# Step 1: Define the function
+def function(x):
+    return (x + 3) ** 2
+
+# Step 2: Define the derivative of the function
+def derivative(x):
+    return 2 * (x + 3)
+
+# Step 3: Initialize values
+x = 2
+learning_rate = 0.1
+iterations = 100
+
+# Store values for plotting
+x_values = [x]
+y_values = [function(x)]
+
+# Step 4: Apply Gradient Descent
+for i in range(iterations):
+    x = x - learning_rate * derivative(x)
+
+    x_values.append(x)
+    y_values.append(function(x))
+
+# Step 5: Print the result
+print("Minimum point (x):", x)
+print("Minimum value (y):", function(x))
+
+# Step 6: Plot the function
+x_plot = [i / 10 for i in range(-60, 41)]
+y_plot = [function(i) for i in x_plot]
+
+plt.plot(x_plot, y_plot, label="y = (x+3)^2")
+plt.scatter(x_values, y_values, color='red', label="Gradient Descent Steps")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Gradient Descent")
+plt.legend()
+plt.grid()
+plt.show()
