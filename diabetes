@@ -1,0 +1,78 @@
+# ML-3: Diabetes Prediction using KNN
+
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import precision_score, recall_score
+
+# Load dataset
+data = pd.read_csv("diabetes.csv")
+
+print("Dataset:")
+print(data.head())
+print("Dataset Shape:", data.shape)
+
+# Separate input and target
+X = data.drop('Outcome', axis=1)
+y = data['Outcome']
+
+print("Target Distribution:")
+print(y.value_counts())
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Feature scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Create and train KNN model
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+print("KNN Model Trained Successfully!")
+
+# Make predictions
+y_pred = knn.predict(X_test)
+
+print("Predicted Values:")
+print(y_pred)
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(cm)
+
+# Accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print("\nAccuracy:", accuracy)
+print("Accuracy Percentage:", accuracy * 100, "%")
+
+# Error rate
+error_rate = 1 - accuracy
+print("Error Rate:", error_rate)
+print("Error Rate Percentage:", error_rate * 100, "%")
+
+# Precision
+precision = precision_score(y_test, y_pred)
+print("Precision:", precision)
+
+# Recall
+recall = recall_score(y_test, y_pred)
+print("Recall:", recall)
+
+# Display all evaluation metrics
+print("\nKNN Model Evaluation")
+print("Confusion Matrix:\n", cm)
+print("Accuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
