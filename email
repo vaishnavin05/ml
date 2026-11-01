@@ -1,0 +1,92 @@
+# ML-2: Email Spam Classification using KNN and SVM
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Load dataset
+data = pd.read_csv("emails.csv")
+
+print("Dataset:")
+print(data.head())
+print("Dataset Shape:", data.shape)
+
+# Separate input and target
+X = data.iloc[:, 1:-1]
+y = data.iloc[:, -1]
+
+print("Target Distribution:")
+print(y.value_counts())
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Feature scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# KNN model
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+# KNN prediction
+y_pred_knn = knn.predict(X_test)
+
+print("\nKNN Accuracy:", accuracy_score(y_test, y_pred_knn))
+print("KNN Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_knn))
+print("KNN Classification Report:")
+print(classification_report(y_test, y_pred_knn))
+
+# SVM model
+svm = SVC(kernel='linear')
+svm.fit(X_train, y_train)
+
+# SVM prediction
+y_pred_svm = svm.predict(X_test)
+
+print("\nSVM Accuracy:", accuracy_score(y_test, y_pred_svm))
+print("SVM Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_svm))
+print("SVM Classification Report:")
+print(classification_report(y_test, y_pred_svm))
+
+# Compare accuracy
+knn_accuracy = accuracy_score(y_test, y_pred_knn)
+svm_accuracy = accuracy_score(y_test, y_pred_svm)
+
+print("\nKNN Accuracy:", knn_accuracy)
+print("SVM Accuracy:", svm_accuracy)
+
+if knn_accuracy > svm_accuracy:
+    print("KNN performs better.")
+elif svm_accuracy > knn_accuracy:
+    print("SVM performs better.")
+else:
+    print("Both models perform equally.")
+
+# Create comparison table
+results = pd.DataFrame({
+    'Algorithm': ['KNN', 'SVM'],
+    'Accuracy': [knn_accuracy, svm_accuracy]
+})
+
+print("\nComparison:")
+print(results)
+
+# Plot accuracy comparison
+plt.bar(results['Algorithm'], results['Accuracy'])
+plt.xlabel("Algorithms")
+plt.ylabel("Accuracy")
+plt.title("KNN vs SVM Accuracy Comparison")
+plt.show()
