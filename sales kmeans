@@ -1,0 +1,62 @@
+# ML-4: K-Means Clustering using Elbow Method
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+# Step 1: Read the dataset
+data = pd.read_csv("sales_data_sample.csv")
+
+print("First 5 rows:")
+print(data.head())
+
+# Step 2: Select numerical features useful for clustering
+possible_features = ['QUANTITYORDERED', 'PRICEEACH', 'SALES', 'MSRP']
+features = [col for col in possible_features if col in data.columns]
+
+# Check whether required numerical columns are available
+if len(features) < 2:
+    raise ValueError("Required numerical columns are not available in the dataset.")
+
+X = data[features].dropna()
+
+print("\nSelected Features:")
+print(features)
+
+# Step 3: Normalize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 4: Apply Elbow Method to find the optimal number of clusters
+wcss = []
+
+for i in range(1, 11):
+    model = KMeans(n_clusters=i, random_state=42, n_init=10)
+    model.fit(X_scaled)
+    wcss.append(model.inertia_)
+
+# Plot the Elbow graph
+plt.plot(range(1, 11), wcss, marker='o')
+plt.title("Elbow Method")
+plt.xlabel("Number of Clusters")
+plt.ylabel("WCSS")
+plt.grid()
+plt.show()
+
+# Step 5: Apply K-Means with selected number of clusters
+# Choose the elbow point by observing the graph
+k = 3
+
+kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+clusters = kmeans.fit_predict(X_scaled)
+
+# Step 6: Add cluster labels to the dataset
+result = data.loc[X.index].copy()
+result['Cluster'] = clusters
+
+print("\nClustered Data:")
+print(result[['SALES', 'QUANTITYORDERED', 'Cluster']].head())
+
+print("\nNumber of records in each cluster:")
+print(result['Cluster'].value_counts())
